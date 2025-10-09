@@ -1,16 +1,13 @@
-import { fileSearchTool, Agent, Runner } from "@openai/agents";
+import { fileSearchTool, Agent, AgentInputItem, Runner } from "@openai/agents";
 
 // Tool definitions
 const fileSearch = fileSearchTool([
-  "vs_68e7b30573c0819186e41e6d277c5e18"
+  "vs_68e7f224150c8191964f6af6f6ac41e7"
 ]);
 
-const queryRewrite = new Agent({
-  name: "Query rewrite",
-  instructions: `Você é um agente especializado em tirar dúvidas dos produtos da Multdigital, que são:
-thinkX
-thinkX Flow
-Think Sil`,
+const multIa = new Agent({
+  name: "Mult-ia",
+  instructions: "Você é um agente especializado em tirar dúvidas dos produtos da Multdigital",
   model: "gpt-4o-mini",
   tools: [fileSearch],
   modelSettings: {
@@ -21,9 +18,13 @@ Think Sil`,
   }
 });
 
+type WorkflowInput = { input_as_text: string };
+
 // Main code entrypoint
-export const runWorkflow = async (workflow) => {
-  const conversationHistory = [
+export const runWorkflow = async (workflow: WorkflowInput) => {
+  const state = {};
+
+  const conversationHistory: AgentInputItem[] = [
     {
       role: "user",
       content: [
@@ -38,13 +39,12 @@ export const runWorkflow = async (workflow) => {
   const runner = new Runner({
     traceMetadata: {
       __trace_source__: "agent-builder",
-      workflow_id: "wf_68e7b247a134819083d2a52da762e4410d5dae588fa6e8f4",
-      version: "3"
+      workflow_id: "wf_68e7b247a134819083d2a52da762e4410d5dae588fa6e8f4"
     }
   });
 
-  const queryRewriteResultTemp = await runner.run(
-    queryRewrite,
+  const multIaResultTemp = await runner.run(
+    multIa,
     [
       ...conversationHistory,
       {
@@ -58,19 +58,19 @@ export const runWorkflow = async (workflow) => {
       }
     ]
   );
-  conversationHistory.push(...queryRewriteResultTemp.newItems.map((item) => item.rawItem));
+  conversationHistory.push(...multIaResultTemp.newItems.map((item) => item.rawItem));
 
-  if (!queryRewriteResultTemp.finalOutput) {
+  if (!multIaResultTemp.finalOutput) {
     throw new Error("Agent result is undefined");
   }
 
-  const queryRewriteResult = {
-    output_text: queryRewriteResultTemp.finalOutput ?? ""
+  const multIaResult = {
+    output_text: multIaResultTemp.finalOutput ?? ""
   };
 
   // Return the final response and conversation history
   return {
-    response: queryRewriteResult.output_text,
+    response: multIaResult.output_text,
     conversationHistory: conversationHistory
   };
 };
