@@ -1,4 +1,4 @@
-import { fileSearchTool, Agent, AgentInputItem, Runner } from "@openai/agents";
+import { fileSearchTool, Agent, Runner } from "@openai/agents";
 
 // Tool definitions
 const fileSearch = fileSearchTool([
@@ -18,13 +18,11 @@ const multIa = new Agent({
   }
 });
 
-type WorkflowInput = { input_as_text: string };
-
 // Main code entrypoint
-export const runWorkflow = async (workflow: WorkflowInput) => {
+export const runWorkflow = async (workflow) => {
   const state = {};
 
-  const conversationHistory: AgentInputItem[] = [
+  const conversationHistory = [
     {
       role: "user",
       content: [
