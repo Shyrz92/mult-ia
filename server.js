@@ -11,16 +11,11 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
-app.use(express.static('public'));
+app.use(express.static(join(__dirname, 'public')));
 
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
-});
-
-// Root endpoint
-app.get('/', (req, res) => {
-  res.json({ message: 'Mult-ia Chat Agent API', version: '1.0.0' });
 });
 
 app.post('/api/chat', async (req, res) => {
