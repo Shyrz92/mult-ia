@@ -131,12 +131,20 @@
       object-fit: cover;
     }
 
+    .message-bubble {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      max-width: 100%;
+    }
+
     .message-content {
       background: white;
       padding: 12px 16px;
       border-radius: 15px;
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
       word-wrap: break-word;
+      white-space: pre-line;
     }
 
     .message.user .message-content {
@@ -147,6 +155,20 @@
     .message.agent .message-content {
       background: white;
       color: #333;
+    }
+
+    .message-time {
+      font-size: 11px;
+      color: #999;
+      padding: 0 8px;
+    }
+
+    .message.user .message-time {
+      text-align: right;
+    }
+
+    .message.agent .message-time {
+      text-align: left;
     }
 
     .chat-input-container {
@@ -298,8 +320,9 @@
         <div class="message-avatar">
           <img src="/favicon-50x50px-dark.png" alt="Bot">
         </div>
-        <div class="message-content">
-          Olá! Como posso ajudá-lo hoje?
+        <div class="message-bubble">
+          <div class="message-content">Olá! Como posso ajudá-lo hoje?</div>
+          <div class="message-time" id="initialMessageTime"></div>
         </div>
       </div>
     </div>
@@ -331,6 +354,13 @@
     const chatInput = document.getElementById('chatInput');
     const sendButton = document.getElementById('sendButton');
 
+    function formatTime() {
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      return `${hours}:${minutes}`;
+    }
+
     function addMessage(text, isUser) {
       const messageDiv = document.createElement('div');
       messageDiv.className = `message ${isUser ? 'user' : 'agent'}`;
@@ -347,12 +377,22 @@
         avatar.appendChild(img);
       }
 
+      const bubble = document.createElement('div');
+      bubble.className = 'message-bubble';
+
       const content = document.createElement('div');
       content.className = 'message-content';
       content.textContent = text;
 
+      const time = document.createElement('div');
+      time.className = 'message-time';
+      time.textContent = formatTime();
+
+      bubble.appendChild(content);
+      bubble.appendChild(time);
+
       messageDiv.appendChild(avatar);
-      messageDiv.appendChild(content);
+      messageDiv.appendChild(bubble);
 
       chatMessages.appendChild(messageDiv);
       chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -434,6 +474,9 @@
         sendMessage();
       }
     });
+
+    // Set initial message time
+    document.getElementById('initialMessageTime').textContent = formatTime();
 
     chatInput.focus();
   </script>
