@@ -1,4 +1,4 @@
-import { fileSearchTool, Agent, AgentInputItem, Runner, withTrace } from "@openai/agents";
+import { fileSearchTool, Agent, Runner, withTrace } from "@openai/agents";
 
 
 // Tool definitions
@@ -36,6 +36,8 @@ Não invente dados não confirmados.`,
 
 // Main code entrypoint
 export const runWorkflow = async (workflow) => {
+  console.log('🔵 Starting workflow with input:', workflow.input_as_text);
+
   return await withTrace("Teste Multblock", async () => {
     const state = {
 
@@ -43,12 +45,16 @@ export const runWorkflow = async (workflow) => {
     const conversationHistory = [
       { role: "user", content: [{ type: "input_text", text: workflow.input_as_text }] }
     ];
+
+    console.log('🔵 Creating runner...');
     const runner = new Runner({
       traceMetadata: {
         __trace_source__: "agent-builder",
         workflow_id: "wf_68e7b247a134819083d2a52da762e4410d5dae588fa6e8f4"
       }
     });
+
+    console.log('🔵 Running agent...');
     const benjamimRespondeResultTemp = await runner.run(
       benjamimResponde,
       [
@@ -70,6 +76,9 @@ export const runWorkflow = async (workflow) => {
     const benjamimRespondeResult = {
       output_text: benjamimRespondeResultTemp.finalOutput ?? ""
     };
+
+    console.log('✅ Workflow completed successfully');
+    console.log('📤 Response:', benjamimRespondeResult.output_text);
 
     return {
       response: benjamimRespondeResult.output_text,
